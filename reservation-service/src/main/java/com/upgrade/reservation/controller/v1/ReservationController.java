@@ -31,16 +31,17 @@ public class ReservationController {
 
     @GetMapping(value = "/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDto> get(@PathVariable("reservationId") String reservationId) {
-        return ResponseEntity.ok(new ReservationDto());
+        return ResponseEntity.ok(reservationFacade.get(reservationId));
     }
 
     @PutMapping(value = "/{reservationId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReservationDto> update(@PathVariable("reservationId") String reservationId, @RequestBody ReservationDto reservationDto) {
-        return ResponseEntity.ok(reservationDto);
+        return ResponseEntity.ok(reservationFacade.update(reservationId, reservationDto));
     }
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity cancel(@PathVariable("reservationId") String reservationId) {
+        reservationFacade.cancel(reservationId);
         return ResponseEntity.noContent().build();
     }
 }
