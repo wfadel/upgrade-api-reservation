@@ -6,16 +6,20 @@ import com.upgrade.availability.model.Availability;
 import com.upgrade.availability.repository.AvailabilityRepository;
 import com.upgrade.common.util.ConversionUtil;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AvailabilityService implements AvailabilityServiceApi {
+    @Value("${upgrade.reservation.maxLookupDays}")
+    private int maxLookupDays;
 
     @Autowired
     private ConversionService conversionService;
@@ -73,5 +77,28 @@ public class AvailabilityService implements AvailabilityServiceApi {
     @Override
     public void deleteByDay(LocalDate day) {
         availabilityRepository.deleteByDay(day);
+    }
+
+    @Transactional
+    @Override
+    public void updateAvailabilitiesReservationId(String reservationId, List<AvailabilityDto> availabilities) {
+        CollectionUtils.emptyIfNull(availabilities).forEach(availability -> {
+            availability.setReservationId(reservationId);
+            updateAvailability(availability);
+        });
+    }
+
+    @Transactional
+    @Override
+    public List<AvailabilityDto> findAvailabilitiesRange(LocalDate startDate, LocalDate endDate) {
+        List<AvailabilityDto> result = findAllAvailabilities(startDate, endDate);
+        // validate that all the days are still available
+        long numberOfDaysInTheRange = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
+        if (result.size() != numberOfDaysInTheRange) {
+            // TODO throw proper UpgradeException
+            throw new RuntimeException();
+        }
+
+        return result;
     }
 }

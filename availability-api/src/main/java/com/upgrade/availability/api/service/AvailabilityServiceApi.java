@@ -14,4 +14,8 @@ public interface AvailabilityServiceApi {
     AvailabilityDto updateAvailability(AvailabilityDto availabilityDto);
 
     void deleteByDay(LocalDate day);
+
+    void updateAvailabilitiesReservationId(String reservationId, List<AvailabilityDto> availabilities);
+
+    List<AvailabilityDto> findAvailabilitiesRange(LocalDate startDate, LocalDate endDate);
 }

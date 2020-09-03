@@ -1,5 +1,6 @@
 package com.upgrade.reservation.facade.v1;
 
+import com.upgrade.common.exception.ReservationDateOverlapException;
 import com.upgrade.reservation.api.dto.v1.ReservationDto;
 import com.upgrade.reservation.api.service.ReservationServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class ReservationFacade {
         try {
             return reservationService.reserve(reservationDto);
         } catch (ObjectOptimisticLockingFailureException e) {
-            throw e;
+            throw new ReservationDateOverlapException();
         }
     }
 }

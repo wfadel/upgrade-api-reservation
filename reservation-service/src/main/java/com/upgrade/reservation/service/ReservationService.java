@@ -13,12 +13,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReservationService implements ReservationServiceApi {
+    @Value("${upgrade.reservation.maxLookupDays}")
+    private int maxLookupDays;
+
+    @Value("${upgrade.reservation.maxReserveDays}")
+    private int maxReserveDays;
 
     @Autowired
     private ConversionService conversionService;
@@ -35,6 +41,8 @@ public class ReservationService implements ReservationServiceApi {
     @Transactional
     @Override
     public ReservationDto reserve(ReservationDto reservationDto) {
+        validateReservationDates(reservationDto.getCheckInDate(), reservationDto.getCheckOutDate());
+
         UserDto userDto = userServiceApi.getOrCreateUser(reservationDto.getUser());
 
         Reservation reservation = conversionService.convert(reservationDto, Reservation.class);
@@ -42,27 +50,26 @@ public class ReservationService implements ReservationServiceApi {
         Reservation dbReservation = reservationRepository.save(reservation);
         ReservationDto result = conversionService.convert(dbReservation, ReservationDto.class);
         result.setUser(userServiceApi.get(dbReservation.getUserId()));
-        List<AvailabilityDto> availabilities = findAvailabilities(reservationDto.getCheckInDate(), reservationDto.getCheckOutDate());
-        updateAvailabilities(result.getReservationId(), availabilities);
+        List<AvailabilityDto> availabilities = availabilityService.findAvailabilitiesRange(reservationDto.getCheckInDate(), reservationDto.getCheckOutDate());
+        availabilityService.updateAvailabilitiesReservationId(result.getReservationId(), availabilities);
         return result;
     }
 
-    private void updateAvailabilities(String reservationId, List<AvailabilityDto> availabilities) {
-        CollectionUtils.emptyIfNull(availabilities).forEach(availability -> {
-            availability.setReservationId(reservationId);
-            availabilityService.updateAvailability(availability);
-        });
-    }
-
-    private List<AvailabilityDto> findAvailabilities(LocalDate startDate, LocalDate endDate) {
-        List<AvailabilityDto> result = availabilityService.findAllAvailabilities(startDate, endDate);
-        // validate that all the days are still available
-        long numberOfDaysInTheRange = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
-        if (result.size() != numberOfDaysInTheRange) {
-            // TODO throw proper UpgradeException
+    private void validateReservationDates(LocalDate checkInDate, LocalDate checkOutDate) {
+        if (checkInDate.isAfter(checkOutDate)) {
             throw new RuntimeException();
         }
 
-        return result;
+        if (checkInDate.isEqual(LocalDate.now()) || checkInDate.isBefore(LocalDate.now())) {
+            throw new RuntimeException();
+        }
+
+        if (checkInDate.isAfter(LocalDate.now().plusDays(maxLookupDays))) {
+            throw new RuntimeException();
+        }
+
+        if (checkInDate.until(checkOutDate).getDays() > maxReserveDays) {
+            throw new RuntimeException();
+        }
     }
 }

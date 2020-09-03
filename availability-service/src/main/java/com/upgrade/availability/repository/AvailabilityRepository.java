@@ -9,7 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 public interface AvailabilityRepository extends CrudRepository<Availability, Long> {
     List<Availability> findAllByDayGreaterThanEqualAndDayLessThanEqualOrderByDay(LocalDate startDate, LocalDate endDate);
 
-    @Query(value = "FROM Availability a WHERE a.day >= ?1 AND a.day <= ?2 ORDER BY a.day")
+    @Query(value = "FROM Availability a WHERE a.day >= ?1 AND a.day <= ?2 AND reservationId IS NULL ORDER BY a.day")
     List<Availability> findAvailabilities(LocalDate startDate, LocalDate endDate);
 
     void deleteByDay(LocalDate day);
