@@ -4,6 +4,8 @@ import com.upgrade.availability.api.dto.v1.AvailabilityDto;
 import com.upgrade.availability.api.service.AvailabilityServiceApi;
 import com.upgrade.availability.model.Availability;
 import com.upgrade.availability.repository.AvailabilityRepository;
+import com.upgrade.common.exception.ReservationDateException;
+import com.upgrade.common.exception.ReservationDateOverlapException;
 import com.upgrade.common.util.ConversionUtil;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AvailabilityService implements AvailabilityServiceApi {
@@ -44,7 +47,7 @@ public class AvailabilityService implements AvailabilityServiceApi {
     public List<AvailabilityDto> findAllAvailabilities(LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
             // TODO throw proper UpgradeException
-            throw new RuntimeException("Start date should be before end date");
+            throw new ReservationDateException("Start date must be before end date");
         }
 
         List<Availability> result = availabilityRepository.findAllByDayGreaterThanEqualAndDayLessThanEqualOrderByDay(startDate, endDate);
@@ -92,13 +95,21 @@ public class AvailabilityService implements AvailabilityServiceApi {
     @Override
     public List<AvailabilityDto> findAvailabilitiesRange(LocalDate startDate, LocalDate endDate) {
         List<AvailabilityDto> result = findAllAvailabilities(startDate, endDate);
+        result = CollectionUtils.emptyIfNull(result).stream()
+                .filter(availabilityDto -> StringUtils.isEmpty(availabilityDto.getReservationId())).collect(Collectors.toList());
         // validate that all the days are still available
         long numberOfDaysInTheRange = ChronoUnit.DAYS.between(startDate, endDate.plusDays(1));
         if (result.size() != numberOfDaysInTheRange) {
-            // TODO throw proper UpgradeException
-            throw new RuntimeException();
+            throw new ReservationDateOverlapException();
         }
 
         return result;
+    }
+
+    @Transactional
+    @Override
+    public List<AvailabilityDto> findByReservationId(String reservationId) {
+        List<Availability> result = availabilityRepository.findByReservationId(reservationId);
+        return conversionUtil.convert(result, AvailabilityDto.class);
     }
 }

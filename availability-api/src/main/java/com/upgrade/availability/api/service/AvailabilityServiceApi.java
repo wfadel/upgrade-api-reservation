@@ -18,4 +18,6 @@ public interface AvailabilityServiceApi {
     void updateAvailabilitiesReservationId(String reservationId, List<AvailabilityDto> availabilities);
 
     List<AvailabilityDto> findAvailabilitiesRange(LocalDate startDate, LocalDate endDate);
+
+    List<AvailabilityDto> findByReservationId(String reservationId);
 }

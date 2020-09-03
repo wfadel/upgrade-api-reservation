@@ -13,4 +13,6 @@ public interface AvailabilityRepository extends CrudRepository<Availability, Lon
     List<Availability> findAvailabilities(LocalDate startDate, LocalDate endDate);
 
     void deleteByDay(LocalDate day);
+
+    List<Availability> findByReservationId(String reseervationId);
 }
