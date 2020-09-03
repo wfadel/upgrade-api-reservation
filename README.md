@@ -41,7 +41,16 @@ Has two modules:
 
 # REST API
 ## reserve
-`curl -X POSTation/json" --data '{"user": {"email": "wfadel@gmail.com", "firstName": "Waseem", "lastName": "Fadel"}, "checkInDate": "2020-09-06", "checkOutDate": "2020-09-09"}`
+`curl -X POSTation/json" --data '{"user": {"email": "wfadel@gmail.com", "firstName": "Waseem", "lastName": "Fadel"}, "checkInDate": "2020-09-06", "checkOutDate": "2020-09-09"}' | jq`
+
+## get reservation
+`curl -X GET 'http://localhost:8080/api/v1/reservations/e1472106-1fd2-4788-bac8-4552644a0ebe' | jq`
+
+## update reservation
+`curl -X PUT 'http://localhost:8080/api/v1/reservations/e1472106-1fd2-4788-bac8-4552644a0ebe' --header "Content-Type: application/json" --data '{"user": {"email": "wfadel@gmail.com", "firstName": "Waseem", "lastName": "Fadel"}, "checkInDate": "2020-09-07", "checkOutDate": "2020-09-09"}' | jq`
+
+## cancel reservation
+`curl -X DELETE 'http://localhost:8080/api/v1/reservations/7f967244-1871-4420-9e10-54ff9b1d68b6'`
 
 ## find availabilities
 `curl 'http://localhost:8080/api/v1/availabilities?start_date=02-09-2020&end_date=08-09-2020' | jq`
