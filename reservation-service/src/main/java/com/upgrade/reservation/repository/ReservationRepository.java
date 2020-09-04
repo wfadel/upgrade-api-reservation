@@ -1,8 +1,7 @@
 package com.upgrade.reservation.repository;
 
 import com.upgrade.reservation.model.Reservation;
-import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ReservationRepository extends CrudRepository<Reservation, UUID> {
+public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 }

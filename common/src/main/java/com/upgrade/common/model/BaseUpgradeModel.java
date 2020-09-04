@@ -1,26 +1,24 @@
 package com.upgrade.common.model;
 
 import java.io.Serializable;
-import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.annotations.Type;
-import org.springframework.data.domain.Persistable;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @MappedSuperclass
-public abstract class BaseUpgradeModel implements Persistable<UUID>, Serializable {
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class BaseUpgradeModel implements Serializable {
     @Id
-    @Type(type = "pg-uuid")
-    protected UUID id;
-
-    @Override
-    public boolean isNew() {
-        if (id == null) {
-            id = UUID.randomUUID();
-            return true;
-        }
-        return false;
-    }
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
+    private Long id;
 }

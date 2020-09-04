@@ -23,7 +23,7 @@ public class AvailabilityController {
     @Autowired
     private AvailabilityServiceApi availabilityService;
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping
     public ResponseEntity<List<AvailabilityDto>> findAvailabilities(@RequestParam(value = "start_date") String startDateStr,

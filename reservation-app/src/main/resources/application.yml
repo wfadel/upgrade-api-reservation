@@ -3,7 +3,7 @@ server:
     include-message: always
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:30394/upgrade_reservation
+    url: jdbc:postgresql://localhost:5432/upgrade_reservation
     username: postgres
     password: admin
     driverClassName: org.postgresql.Driver

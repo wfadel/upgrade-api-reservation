@@ -33,24 +33,32 @@ Has two modules:
 * reservation-service provides CRUD endpoints for the campsite reservation.
 
 ## Improvements
-* bundle the service and the api in a single module that has the pair
+* add javadoc
+* Localize the messages
+* package the app in a docker image
+* use swagger for api documentation
+* bundle the service and the api in a single maven module that has the pair
 * add logs
 * better error handling
-* caching and indexing
+* caching (indexing may not be needed for the moment since the search is running against maximum of 30 available days)
+* unit test each of the application layers
+* truncate reservation and users tables before running each test
+* higher test coverage
+* test exceptional paths
 * the job needs to validate the availabilities every time it starts to make sure it didn't skip a day due to a crash for example
 
 # REST API
 ## reserve
-`curl -X POSTation/json" --data '{"user": {"email": "wfadel@gmail.com", "firstName": "Waseem", "lastName": "Fadel"}, "checkInDate": "2020-09-06", "checkOutDate": "2020-09-09"}' | jq`
+`curl -X POST 'http://localhost:8080/api/v1/reservations' -H "Content-Type: application/json" --data '{"user": {"email": "john.doe@gmail.com", "firstName": "John", "lastName": "Doe"}, "checkInDate": "2020-09-06", "checkOutDate": "2020-09-09"}' | jq`
 
 ## get reservation
-`curl -X GET 'http://localhost:8080/api/v1/reservations/e1472106-1fd2-4788-bac8-4552644a0ebe' | jq`
+`curl -X GET 'http://localhost:8080/api/v1/reservations/1' | jq`
 
 ## update reservation
-`curl -X PUT 'http://localhost:8080/api/v1/reservations/e1472106-1fd2-4788-bac8-4552644a0ebe' --header "Content-Type: application/json" --data '{"user": {"email": "wfadel@gmail.com", "firstName": "Waseem", "lastName": "Fadel"}, "checkInDate": "2020-09-07", "checkOutDate": "2020-09-09"}' | jq`
+`curl -X PUT 'http://localhost:8080/api/v1/reservations/1' --header "Content-Type: application/json" --data '{"user": {"email": "john.doe", "firstName": "John", "lastName": "Doe"}, "checkInDate": "2020-09-07", "checkOutDate": "2020-09-09"}' | jq`
 
 ## cancel reservation
-`curl -X DELETE 'http://localhost:8080/api/v1/reservations/7f967244-1871-4420-9e10-54ff9b1d68b6'`
+`curl -X DELETE 'http://localhost:8080/api/v1/reservations/1'`
 
 ## find availabilities
-`curl 'http://localhost:8080/api/v1/availabilities?start_date=02-09-2020&end_date=08-09-2020' | jq`
+`curl 'http://localhost:8080/api/v1/availabilities?start_date=2020-09-02&end_date=2020-09-08' | jq`

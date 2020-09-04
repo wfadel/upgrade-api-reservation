@@ -4,7 +4,6 @@ import com.upgrade.user.api.dto.v1.UserDto;
 import com.upgrade.user.api.service.UserServiceApi;
 import com.upgrade.user.model.User;
 import com.upgrade.user.repository.UserRepository;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class UserService implements UserServiceApi {
 
     @Override
     public UserDto get(String userId) {
-        User result = userRepository.findById(UUID.fromString(userId)).orElse(null);
+        User result = userRepository.findById(Long.valueOf(userId)).orElse(null);
         return conversionService.convert(result, UserDto.class);
     }
 

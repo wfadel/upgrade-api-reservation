@@ -58,8 +58,8 @@ public class AvailabilityService implements AvailabilityServiceApi {
     @Override
     public List<AvailabilityDto> findAvailabilities(LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
-            // TODO throw proper UpgradeException
-            throw new RuntimeException("Start date should be before end date");
+            // TODO the message (along with other messages) should be localized
+            throw new ReservationDateException("Start date should be before end date");
         }
 
 

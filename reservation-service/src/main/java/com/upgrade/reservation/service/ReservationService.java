@@ -12,7 +12,6 @@ import com.upgrade.user.api.dto.v1.UserDto;
 import com.upgrade.user.api.service.UserServiceApi;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -81,8 +80,8 @@ public class ReservationService implements ReservationServiceApi {
     @Transactional
     @Override
     public ReservationDto get(String reservationId) {
-        Reservation result = reservationRepository.findById(UUID.fromString(reservationId))
-                .orElseThrow(() -> new NotFoundException(String.format("Resrvation not found by id %s", reservationId)));
+        Reservation result = reservationRepository.findById(Long.valueOf(reservationId))
+                .orElseThrow(() -> new NotFoundException(String.format("Reservation not found by id %s", reservationId)));
 
         return conversionService.convert(getModel(reservationId), ReservationDto.class);
     }
@@ -92,11 +91,11 @@ public class ReservationService implements ReservationServiceApi {
     public void cancel(String reservationId) {
         List<AvailabilityDto> availabilities = availabilityService.findByReservationId(reservationId);
         availabilityService.updateAvailabilitiesReservationId(null, availabilities);
-        reservationRepository.deleteById(UUID.fromString(reservationId));
+        reservationRepository.deleteById(Long.valueOf(reservationId));
     }
 
     private Reservation getModel(String reservationId) {
-        return reservationRepository.findById(UUID.fromString(reservationId))
+        return reservationRepository.findById(Long.valueOf(reservationId))
                 .orElseThrow(() -> new NotFoundException(String.format("Resrvation not found by id %s", reservationId)));
     }
 
